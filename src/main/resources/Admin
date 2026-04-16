@@ -1,0 +1,78 @@
+package com.gokul.careervexjobportal.controller;
+
+import com.gokul.careervexjobportal.dto.JobResponse;
+import org.springframework.web.bind.annotation.RestController;
+import com.gokul.careervexjobportal.model.Job;
+import com.gokul.careervexjobportal.model.User;
+import com.gokul.careervexjobportal.repository.ApplicationRepository;
+import com.gokul.careervexjobportal.repository.JobPostRepository;
+import com.gokul.careervexjobportal.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
+@RestController
+@RequestMapping("/api/admin")
+@RequiredArgsConstructor
+@Slf4j
+public class AdminController {
+
+    private final UserRepository userRepository;
+    private final JobPostRepository jobRepository;
+    private final ApplicationRepository applicationRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${python.flask.url}")
+    private String flaskUrl;
+
+    // GET all users
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    // DELETE user
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        if (!userRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found: " + id));
+        }
+        userRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
+    }
+
+    // GET all jobs (including inactive)
+    @GetMapping("/jobs")
+    public ResponseEntity<List<JobResponse>> getAllJobs() {
+        return ResponseEntity.ok(jobRepository.findAll());
+    }
+
+    // GET analytics (proxies to Python Flask)
+    @GetMapping("/analytics")
+    public ResponseEntity<?> getAnalytics() {
+        try {
+            String statsUrl = flaskUrl + "/api/stats";
+            ResponseEntity<Map> flaskResponse = restTemplate.getForEntity(statsUrl, Map.class);
+            return ResponseEntity.ok(flaskResponse.getBody());
+        } catch (Exception e) {
+            log.warn("Python Flask unavailable, returning local stats: {}", e.getMessage());
+            // Fallback: compute stats locally
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("total_users", userRepository.count());
+            stats.put("total_jobs", jobRepository.count());
+            stats.put("total_applications", applicationRepository.count());
+            stats.put("jobs_today", 0); // simplified fallback
+            stats.put("top_locations", List.of());
+            stats.put("note", "Python Flask service unavailable - showing local stats");
+            return ResponseEntity.ok(stats);
+        }
+    }
+}
+
+

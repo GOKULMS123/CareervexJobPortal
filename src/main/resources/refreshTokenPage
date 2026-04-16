@@ -1,0 +1,156 @@
+// ==========================
+// REFRESH TOKEN IMPLEMENTATION (SINGLE FILE VIEW)
+// ==========================
+
+// ---------- ENTITY ----------
+@Entity
+@Table(name = "refresh_tokens")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+class RefreshToken {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String token;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private LocalDateTime expiryDate;
+}
+
+
+// ---------- REPOSITORY ----------
+@Repository
+interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+
+    Optional<RefreshToken> findByToken(String token);
+
+    void deleteByUser(User user);
+}
+
+
+// ---------- SERVICE ----------
+@Service
+@RequiredArgsConstructor
+class RefreshTokenService {
+
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
+
+    private final long REFRESH_EXPIRATION = 7 * 24 * 60 * 60; // 7 days
+
+    public RefreshToken createRefreshToken(String username) {
+
+        User user = userRepository.findByEmailOrPhone(username, username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Remove old token (one token per user)
+        refreshTokenRepository.deleteByUser(user);
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .user(user)
+                .token(UUID.randomUUID().toString())
+                .expiryDate(LocalDateTime.now().plusSeconds(REFRESH_EXPIRATION))
+                .build();
+
+        return refreshTokenRepository.save(refreshToken);
+    }
+
+    public RefreshToken verifyToken(String token) {
+
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+
+        if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            refreshTokenRepository.delete(refreshToken);
+            throw new RuntimeException("Refresh token expired");
+        }
+
+        return refreshToken;
+    }
+}
+
+
+// ---------- AUTH CONTROLLER (UPDATED) ----------
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+class AuthController {
+
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
+
+    // -------- LOGIN API --------
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        req.getContact(),
+                        req.getPassword()
+                )
+        );
+
+        User user = userRepository
+                .findByEmailOrPhone(req.getContact(), req.getContact())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String accessToken = jwtUtil.generateToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken.getToken(),
+                "role", user.getRole(),
+                "userId", user.getId()
+        ));
+    }
+
+
+    // -------- REFRESH TOKEN API --------
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+
+        String requestToken = request.get("refreshToken");
+
+        RefreshToken refreshToken = refreshTokenService.verifyToken(requestToken);
+
+        User user = refreshToken.getUser();
+
+        String newAccessToken = jwtUtil.generateToken(user);
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", newAccessToken,
+                "refreshToken", requestToken
+        ));
+    }
+}
+
+
+// ---------- JWT UTIL (ONLY EXPIRY CHANGE) ----------
+@Component
+class JwtUtil {
+
+    private final String SECRET = "secret-key";
+
+    // 15 minutes
+    private final long EXPIRATION = 15 * 60 * 1000;
+
+    public String generateToken(User user) {
+
+        return Jwts.builder()
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .compact();
+    }
+}
