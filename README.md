@@ -104,16 +104,13 @@ Client → Controller → DTO → Service → Entity → Database
 
 ## ⚙️ Installation & Setup
 
-Follow these steps to run the project locally:<br>
-- Prerequisites
-
-    Make sure you have the following installed:
-
+Follow these steps to run the project locally:
+- Prerequisites<br>
+    Make sure you have the following installed:<br>
     - Java 17+
     - InteliJ IDE or Any Code Editor(Maven)
     - PostgreSQL
-    - Git
-
+    - Git<br>
 - Open the project folder in Code Editor
 - Clone the repository<br>
   git Clone: https://github.com/GOKULMS123/CareervexJobPortal.git
@@ -123,35 +120,26 @@ Follow these steps to run the project locally:<br>
 ## 🌐 Access the Application or API Testing
 
 You can test the APIs using **Postman** or **Swagger UI**.
-###  🚀 Using Swagger UI (Recommended)
-
+###  🚀 Using Swagger UI (Recommended)<br>
 1. Start the application
 2. Open:
    http://localhost:8080/swagger-ui/index.html
 3. Explore available endpoints
-4. Click **"Authorize"** and enter:
-
+4. Click **"Authorize"** and enter:<br>
    Bearer YOUR_TOKEN
-
 5. Execute APIs directly from the browser
 
 ### 📬 Using Postman
 
 1. Import the provided Postman Collection
-2. Set the base URL:
-
+2. Set the base URL:<br>
    http://localhost:8080
-
-3. Register a new user:
+3. Register a new user:<br>
    POST /api/auth/register
-
 4. Login to get JWT token:
    POST /api/auth/login
-
-5. Add token to headers:
-
+5. Add token to headers:<br>
    Authorization: Bearer YOUR_TOKEN
-
 6. Test secured endpoints (Jobs, Applications, Profile)
 
 ## 🚧 Future Improvements
