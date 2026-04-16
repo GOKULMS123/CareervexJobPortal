@@ -167,4 +167,4 @@ You can test the APIs using **Postman** or **Swagger UI**.
 
 **Gokul Marimuthu**<br>
 Aspiring Software Developer | Fresher<br>
-[Email](gokulmarimuthu44@gmail.com) | [GitHub](https://github.com/GOKULMS123) | [LinkedIn](https://www.linkedin.com/in/gokul-marimuthu/)
+[Email](mailto:gokulmarimuthu44@gmail.com) | [GitHub](https://github.com/GOKULMS123) | [LinkedIn](https://www.linkedin.com/in/gokul-marimuthu/)
