@@ -1,6 +1,6 @@
 # CareerVex Job Portal - Backend
 
-## Project Description
+## 📌 Project Description
 
 A Job Portal Backend Application is built using Java and Spring Boot that powers a 
 full-featured job portal platform. It provides secure and scalable REST APIs for
@@ -10,7 +10,7 @@ roles such as recruiters and candidates.
 This backend handles secure communication, role-based access control, and 
 scalable data management for a modern job portal system.
 
-## Features
+## ✨ Features
 
 - JWT-based Authentication & Authorization
 - RESTful API design
@@ -22,7 +22,7 @@ scalable data management for a modern job portal system.
 - Apply for Jobs & Application Status Updates
 - Secure API Endpoints with Spring Security
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Language:** Java
 - **Backend:** Spring Boot
@@ -34,7 +34,7 @@ scalable data management for a modern job portal system.
 - **Logging:** SLF4J
 - **Lombok:** For boilerplate reduction
 
-## Project Structure
+## 📁 Project Structure
 
 All source code is organized under:
 ```
@@ -50,7 +50,7 @@ com.gokul.careervexjobportal
 ├── service         # Business logic
 ```
 
-## Architecture
+## 🏗️ Architecture
 
 This project follows a layered architecture to ensure clean separation of concerns, 
 scalability, and maintainability.
@@ -60,7 +60,7 @@ Client → Controller → DTO → Service → Entity → Database
         Client ← Controller ← DTO ← Service
 ```
 
-## API Endpoints
+## 🔗 API Endpoints
 
 ### Auth APIs
 ```
@@ -110,13 +110,13 @@ Follow these steps to run the project locally:<br>
     Make sure you have the following installed:
 
     - Java 17+
-    - Intelij IDE or Any Code Editor(Maven)
+    - InteliJ IDE or Any Code Editor(Maven)
     - PostgreSQL
     - Git
 
 - Open the project folder in Code Editor
 - Clone the repository<br>
-  Git Clone: https://github.com/GOKULMS123/CareervexJobPortal.git
+  git Clone: https://github.com/GOKULMS123/CareervexJobPortal.git
 - Configure PostgreSQL database in application.properties
 - Run the Spring Boot application
 
@@ -166,8 +166,5 @@ You can test the APIs using **Postman** or **Swagger UI**.
 ## 👨‍💻 Author
 
 **Gokul Marimuthu**<br>
-Aspiring Software Developer | Fresher
-
-📧 Email: gokulmarimuthu44@gmail.com <br>
-🔗 GitHub: https://github.com/GOKULMS123 <br>
-🔗 LinkedIn: https://www.linkedin.com/in/gokul-marimuthu/
+Aspiring Software Developer | Fresher<br>
+[Email](gokulmarimuthu44@gmail.com) | [GitHub](https://github.com/GOKULMS123) | [LinkedIn](https://www.linkedin.com/in/gokul-marimuthu/)
